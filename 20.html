@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سجل الديون الشامل</title>
+    <style>
+        /* تنسيقات الصفحة */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* تنسيق اللوجو */
+        .logo {
+            width: 120px;
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+        }
+
+        /* تنسيق العنوان الرئيسي */
+        .main-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .main-title h1 {
+            color: #333;
+            font-size: 24px;
+            margin: 10px 0;
+        }
+
+        /* تنسيقات المحتوى */
+        .container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* تنسيقات العناوين الفرعية */
+        .sub-title {
+            color: #333;
+            font-size: 24px;
+            margin: 20px 0 10px;
+            text-align: center;
+        }
+
+        /* تنسيقات البحث */
+        #searchBox {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* تنسيقات النتائج */
+        #results {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+        }
+        .result-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            width: 100%;
+            max-width: 250px;
+            text-align: left;
+            transition: transform 0.3s;
+        }
+        .result-card:hover {
+            transform: scale(1.05);
+        }
+        .result-card h3 {
+            margin: 0;
+            color: #333;
+        }
+        .result-card p {
+            color: #555;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        /* تنسيقات البطاقات */
+        .debt-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%;
+            max-width: 200px;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .debt-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .debt-amount {
+            font-size: 24px;
+            color: #333;
+            font-weight: bold;
+        }
+        .currency-label {
+            font-size: 16px;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        /* تنسيقات القائمة المنسدلة */
+        .menu-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .menu-icon {
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+        }
+        .reload-icon {
+            cursor: pointer;
+            font-size: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: transparent;
+            border: none;
+            color: black;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 35px;
+            right: 0;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            z-index: 1000;
+            width: 200px;
+            padding: 10px 0;
+        }
+        .dropdown-menu a {
+            display: block;
+            padding: 10px 15px;
+            color: #000000;
+            font-weight: bold;
+            font-size: 16px;
+            background-color: transparent;
+            border-radius: 8px;
+            transition: background-color 0.3s, color 0.3s;
+            text-decoration: none;
+        }
+        .dropdown-menu a:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        /* Media Queries for responsiveness */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+
+            .result-card, .debt-card {
+                max-width: 90%;
+            }
+
+            #searchBox {
+                max-width: 80%;
+            }
+
+            .logo {
+                width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- أيقونة إعادة التحميل -->
+    <div class="reload-icon" onclick="reloadPage()">↻</div>
+
+    <!-- أيقونة القائمة المنسدلة -->
+    <div class="menu-container">
+        <div class="menu-icon" onclick="toggleDropdown()">⋮</div>
+        <div class="dropdown-menu" id="dropdownMenu">
+            <a href="mony2024.html">الديون المستلمة 2024</a>
+            <a href="mony2023.html">الديون المستلمة 2023</a>
+            <a href="mony2022.html">الديون المستلمة 2022</a>
+        </div>
+    </div>
+
+    <!-- قسم العنوان مع اللوجو -->
+    <div class="main-title">
+        <img src="logo.png" alt="Logo" class="logo">
+        <h1>البحث في سجل الديون</h1>
+    </div>
+
+    <!-- محتوى الصفحة -->
+    <div class="container">
+        <input type="text" id="searchBox" placeholder="اكتب للبحث...">
+        <button onclick="search()">بحث</button>
+        <div id="results"></div>
+
+        <h1 class="sub-title">مجموع الديون</h1>
+        <button onclick="displayDebt()">عرض مجموع الديون</button>
+        
+        <div id="debtDisplay" class="debt-container"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script>
+        let searchResults = [];
+        let debtData = { dinar: 27636000, dollar: 65373 };
+
+        function loadFixedDebt() {
+            const timestamp = new Date().getTime();
+            const debtFilePath = `dato.xlsx?v=${timestamp}`;
+
+            fetch(debtFilePath)
+                .then(response => response.arrayBuffer())
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: "array" });
+                    const firstSheet = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheet];
+                    const debtJson = XLSX.utils.sheet_to_json(worksheet);
+
+                    if (debtJson.length > 0) {
+                        debtData.dinar = debtJson[0]["دينار"] || 0;
+                        debtData.dollar = debtJson[0]["دولار"] || 0;
+                    }
+                })
+                .catch(error => console.error('Error loading the debt Excel file:', error));
+        }
+
+        function loadSearchData() {
+            const timestamp = new Date().getTime();
+            const searchFilePath = `data.xlsx?v=${timestamp}`;
+
+            fetch(searchFilePath)
+                .then(response => response.arrayBuffer())
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: "array" });
+                    const firstSheet = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheet];
+                    searchResults = XLSX.utils.sheet_to_json(worksheet);
+                })
+                .catch(error => console.error('Error loading the search Excel file:', error));
+        }
+
+        function search() {
+            const searchTerm = document.getElementById("searchBox").value.toLowerCase();
+            const resultsContainer = document.getElementById("results");
+            resultsContainer.innerHTML = "";
+
+            const filteredResults = searchResults.filter(result => 
+                result["الاسم"].toLowerCase().includes(searchTerm) || result["العنوان"].toLowerCase().includes(searchTerm)
+            );
+
+            if (filteredResults.length > 0) {
+                filteredResults.forEach(result => {
+                    const resultCard = document.createElement("div");
+                    resultCard.className = "result-card";
+                    resultCard.innerHTML = `
+                        <h3>${result["الاسم"]}</h3>
+                        <p>${result["العنوان"]}</p>
+                    `;
+                    resultsContainer.appendChild(resultCard);
+                });
+            } else {
+                resultsContainer.innerHTML = "<p>لا توجد نتائج</p>";
+            }
+        }
+
+        function displayDebt() {
+            const debtDisplay = document.getElementById("debtDisplay");
+            debtDisplay.innerHTML = `
+                <div class="debt-card">
+                    <div class="debt-amount">${debtData.dinar.toLocaleString()}</div>
+                    <div class="currency-label">الدينار</div>
+                </div>
+                <div class="debt-card">
+                    <div class="debt-amount">${debtData.dollar.toLocaleString()}</div>
+                    <div class="currency-label">الدولار</div>
+                </div>
+            `;
+        }
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById("dropdownMenu");
+            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+        }
+
+        function reloadPage() {
+            location.reload();
+        }
+
+        window.onload = function() {
+            loadFixedDebt();
+            loadSearchData();
+        };
+    </script>
+</body>
+</html>
